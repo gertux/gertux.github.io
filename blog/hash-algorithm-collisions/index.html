@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>hobbiton</title>
+        <link rel="stylesheet" href="https:&#x2F;&#x2F;www.hobbiton.be&#x2F;h.css">
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-container">
+                <ul class="nav">
+                    
+                </ul>
+                <div class="about">
+                    <a href="https:&#x2F;&#x2F;www.hobbiton.be"><img src="/i/logo.svg" alt="hobbiton"/></a>
+                    <p class="lead">supporting open source since 1997</p>
+                    <p class="social"><img src="/i/twitter.svg"/><a href="https://twitter.com/gert_dewit">@gert_dewit</a></p>
+                    <p class="social"><img src="/i/github.svg"/><a href="https://github.com/gertux">gertux</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            
+<div class="page">
+  <h1 class="page-title">Hash Algorithm Collisions</h1>
+  <span class="page-date">2012-01-27</span>
+  <p>At the <a href="http://events.ccc.de/congress/2011/Fahrplan/index.en.html">28th Chaos Communication Congress</a>
+Alexander Klink and Julian Wälde presented a talk about a very effective Denial Of Service attack which targets all
+major web development platforms (PHP, Java, .NET, Python, ...).</p>
+<p><a name="continue-reading"></a></p>
+<p>The recording of the presentation can be watched on <a href="http://www.youtube.com/watch?v=R2Cq3CLI6H8">YouTube</a> and the slides
+of the presentation are also available in <a href="http://events.ccc.de/congress/2011/Fahrplan/attachments/2007_28C3_Effective_DoS_on_web_application_platforms.pdf">PDF format</a></p>
+<p>Because the response from vendors was lame, to say the least, I wondered what could be done while the fundamental
+problem was being fixed ... or not. In particular the reaction from Oracle was very disappointing.</p>
+<p>As most of my customers use a Java platform and several use PHP I was looking for a solution until the vendors fixed
+their product.</p>
+<p>One customer with several Tomcat web containers, PHP servers and a Python based Plone content management system uses an
+Apache reverse proxy to unify all these servers and applications behind their main website URL. This got me thinking
+about a solution which leverages this single entry point.</p>
+<p>So I set out to write an Apache module which filters attacks against the Java and PHP string hashing algorithms. The
+Python server is not that vulnerable because it runs on a 64bit Python engine.</p>
+<p>The module is in testing and seems to hold off the attacks pretty good. As soon as I'm sure the module doesn't drop
+valid packets I'll upload the code to github.</p>
+<p>Just checked the <a href="http://www.ocert.org/advisories/ocert-2011-003.html">oCert site</a>. The page claims some fixes but I
+would qualify these updates as workarounds.</p>
+
+</div>
+
+        </div>
+    </body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>hobbiton</title>
+        <link rel="stylesheet" href="https:&#x2F;&#x2F;www.hobbiton.be&#x2F;h.css">
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-container">
+                <ul class="nav">
+                    
+                </ul>
+                <div class="about">
+                    <a href="https:&#x2F;&#x2F;www.hobbiton.be"><img src="/i/logo.svg" alt="hobbiton"/></a>
+                    <p class="lead">supporting open source since 1997</p>
+                    <p class="social"><img src="/i/twitter.svg"/><a href="https://twitter.com/gert_dewit">@gert_dewit</a></p>
+                    <p class="social"><img src="/i/github.svg"/><a href="https://github.com/gertux">gertux</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            
+<div class="page">
+  <h1 class="page-title">STM8 linux Recipes</h1>
+  <span class="page-date">2017-06-26</span>
+  <p>Some ST 8-bit microcontroller recipes that could be useful for someone trying out these surprisingly powerfull devices.</p>
+<p><a name="continue-reading"></a></p>
+<p>These STM8 recipes are the result of my journey into STM8 programming on linux.
+They all implement 1 thing so I can use it as a reference when needed in a more complex setting.</p>
+<p>Feel free to use them however you like as they are released into the public domain.</p>
+<h2 id="requirements">Requirements</h2>
+<p>These recipes work out-of-the box with what I think is the cheapest STM8 board available, the STM8S103F3P6 boards that
+can be bought via the well known cheap channels for about € 0,60.</p>
+<p><img src="./stm8s103f3p6-module.jpg" alt="STM8S103F3P6 board" /></p>
+<p>The same sites also sell dirt cheap programmers for less than € 2,00 but any ST-Link V2 should work.</p>
+<p>The recipes are usable on any platform, with any toolchain.
+But if you want to build, flash and run these little programs as they are presented, you need the tools below.</p>
+<ul>
+<li>sdcc : <a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a></li>
+<li>stm8flash: <a href="https://github.com/vdudouyt/stm8flash.git">https://github.com/vdudouyt/stm8flash.git</a></li>
+</ul>
+<h2 id="recipes">Recipes</h2>
+<ul>
+<li>blinky : the 'Hello world' of embedded using a busy loop (not a very good idea, but it doesn't get any simpler)</li>
+<li>blinky-timer : a more sensible blinking LED implementation using a timer</li>
+<li>serial : write every second a message to the UART</li>
+<li>pwm : output a varying PWM signal</li>
+<li>adc : measure analog signal using end-of-conversion</li>
+<li>awd : measure analog signal using analog watchdog</li>
+<li>pwm-awd-control : combined recipe where the measured analog value is used to control a PWM signal</li>
+</ul>
+
+</div>
+
+        </div>
+    </body>
+</html>

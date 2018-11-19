@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>hobbiton</title>
+        <link rel="stylesheet" href="https:&#x2F;&#x2F;www.hobbiton.be&#x2F;h.css">
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-container">
+                <ul class="nav">
+                    
+                </ul>
+                <div class="about">
+                    <a href="https:&#x2F;&#x2F;www.hobbiton.be"><img src="/i/logo.svg" alt="hobbiton"/></a>
+                    <p class="lead">supporting open source since 1997</p>
+                    <p class="social"><img src="/i/twitter.svg"/><a href="https://twitter.com/gert_dewit">@gert_dewit</a></p>
+                    <p class="social"><img src="/i/github.svg"/><a href="https://github.com/gertux">gertux</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            
+<div class="page">
+  <h1 class="page-title">Hash Algorithm Collision Fix using an Apache Module</h1>
+  <span class="page-date">2012-02-04</span>
+  <p>As promised <a href="https://www.hobbiton.be/blog/hash-algorithm-collisions/">here</a>, I've put the Apache module that protects Java and PHP
+sites from Hash Algorithm Collision DOS attacks on <a href="https://github.com/gertux/HACFmodule">GitHub</a>.</p>
+<p><a name="continue-reading"></a></p>
+<p>The module can be used by sites who use an Apache reverse proxy in front of their Java (Tomcat, JBoss, ...) or PHP sites.</p>
+<p>The module parses the HTTP GET or POST parameters, calculates their hashes for the backend platform en checks if the
+hash collisions or number of parameters don't exceed a configured maximum. It one of these settings are exceeded the
+HTTP request is discarded and never sent to the backend system.</p>
+<h2 id="install">Install</h2>
+<p>The module uses the GNU autotools installation method, you just have to tell it where your Apache server is installed.
+Your Apache server needs to support DSO modules.</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#bf616a;">./configure --with-apache</span><span style="color:#c0c5ce;">=/path/to/apache/install
+</span><span style="color:#bf616a;">make
+</span><span style="color:#bf616a;">make</span><span style="color:#c0c5ce;"> install
+</span></pre>
+<p>The install action will place libmodhacf.so in the Apache server's modules directory and add a <strong>LoadModule</strong> directive
+in httpd.conf. You should see a line similar to the following in your httpd.conf:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">LoadModule hacf_module        modules/libmodhacf.so
+</span></pre><h2 id="usage">Usage</h2>
+<p>If you already use an Apache reverse proxy, just add the correct <b>HacfLanguage</b> directive to the relevant section
+of your httpd.conf.</p>
+<p>The configuration for a Java site with URL http://server.example.com/app would be:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">location </span><span style="color:#d08770;">app</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">/app</span><span style="color:#c0c5ce;">&quot;&gt;
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">HacfLanguage Java
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPass http://server.example.com/app
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPassReverse http://server.example.com/app
+</span><span style="color:#c0c5ce;">&lt;/</span><span style="color:#bf616a;">location</span><span style="color:#c0c5ce;">&gt;
+</span></pre>
+<p>For a PHP5 site, use PHP as the value of the HacfLanguage setting.</p>
+<p>The request filtering can be tuned using the parameters:</p>
+<ul>
+<li>HacfMaxCollisions, maximum number of allowed collisions before a request is dropped (default 3)</li></li>
+<li>HacfMaxParameters, maximum number of allowed parameters before a request is dropped (default 256)</li></li>
+</ul>
+<p>The default settings for these parameters can seem aggressive but the should be fine for most applications.</p>
+<h2 id="what-s-next">What's next ?</h2>
+<p>The code in <a href="https://github.com/gertux/HACFmodule">GitHub</a> has a pretty limited feature set because I set out to protect
+a specific customer's site, but there is a
+<a href="https://github.com/gertux/HACFmodule/issues?sort=created&amp;direction=desc&amp;state=open&amp;page=1&amp;milestone=1">Version 1.0.0 Milestone</a>
+release planned with support for APR 1 (Apache 2.2), PHP4 sites and Python (Plone and mod_python) sites.</p>
+
+</div>
+
+        </div>
+    </body>
+</html>

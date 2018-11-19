@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>hobbiton</title>
+        <link rel="stylesheet" href="https:&#x2F;&#x2F;www.hobbiton.be&#x2F;h.css">
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-container">
+                <ul class="nav">
+                    
+                </ul>
+                <div class="about">
+                    <a href="https:&#x2F;&#x2F;www.hobbiton.be"><img src="/i/logo.svg" alt="hobbiton"/></a>
+                    <p class="lead">supporting open source since 1997</p>
+                    <p class="social"><img src="/i/twitter.svg"/><a href="https://twitter.com/gert_dewit">@gert_dewit</a></p>
+                    <p class="social"><img src="/i/github.svg"/><a href="https://github.com/gertux">gertux</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            
+<div class="page">
+  <h1 class="page-title">Absolute URLs in a backend Tomcat server</h1>
+  <span class="page-date">2012-02-10</span>
+  <p>Transparently resolving URLs in a proxied Tomcat web app without hard coded base URLs in application code.</p>
+<p><a name="continue-reading"></a></p>
+<p>While I was integrating <a href="http://chemistry.apache.org/">Apache Chemistry</a> in a webapp that runs on a backend
+<a href="http://tomcat.apache.org/">Tomcat</a> server I stumbled upon the issue that when an application needs to return absolute
+URLs it should know what the original request looked like.</p>
+<p>If your Tomcat server only hides behind 1 front end URL you can use the <strong>proxyName</strong> and <strong>proxyPort</strong> attributes of
+the <strong>Connector</strong> configuration. Provided that the scheme (http or https) isn't changed.</p>
+<p>The setup that was used in this case was a little more complicated.</p>
+<ul>
+<li>The backend Tomcat server application should be accessible from various environments with their own domain names: repo.intranet.frontend.org, repo.extranet.frontend.org, repo.frontend.org</li></li>
+<li>The service should use an https connection that is terminated on the reverse proxy</li></li>
+</ul>
+<p>After submitting a patch to the Apache Chemistry team that used the <strong>X-Forwarded-Host</strong> and <strong>X-Forwarded-Proto</strong> to
+determine the URL from the original request, one team member mentioned the RemoteIpValve. I already looked at that
+possibility but it didn't solve my problem at first sight, because the main goal of this valve is to determine the
+client's IP address.</p>
+<p>In combination with the correct <a href="http://httpd.apache.org/">Apache Server</a> reverse proxy settings it does solve my
+problem.</p>
+<h2 id="example-configuration">Example configuration</h2>
+<p>The published URLs are <strong>https://repo.extranet.frontend.org/cmis and https://repo.frontend.org/cmis</strong>, the Apache HTTP
+Server handles https termination and it's IP address is 192.168.100.254. The backend application URL is
+<strong>http://tomcat.backend.org:8080/cmis</strong></p>
+<p>This snippet goes into Apache's httpd.conf:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">Location</span><span style="color:#c0c5ce;"> /cmis&gt;
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">RequestHeader set X-Forwarded-Proto &quot;https&quot;
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPreserveHost
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPass http://tomcat.backend.org:8080/cmis
+</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPassReverse http://tomcat.backend.org:8080/cmis
+</span><span style="color:#c0c5ce;">&lt;/</span><span style="color:#bf616a;">Location</span><span style="color:#c0c5ce;">&gt;
+</span></pre>
+<p>The <strong>ProxyPreserveHost</strong> directive passes the Original Host HTTP header to the proxied host, for this example
+repo.extranet.frontend.org or repo.frontend.org, which will be returned by request.getServerName().</p>
+<p>The <strong>RequestHeader set X-Forwarded-Proto &quot;https&quot;</strong> directive explicitly sets the X-Forwarded-Proto request header which
+will be used by the Tomcat RemoteIpValve.</p>
+<p>This snippet goes into Tomcat's server.xml in the <strong>Engine</strong> section:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">Valve 
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">className</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">org.apache.catalina.valves.RemoteIpValve</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-for</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpProxiesHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-by</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">protocolHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-proto</span><span style="color:#c0c5ce;">&quot; /&gt;
+</span></pre>
+<p>The valve will calculate the client's IP address, will set request.getScheme() to the value of the <strong>X-Forwarded-Proto</strong>
+header (https) and the request.getServerPort() to 443.</p>
+<p><strong>Caution:</strong> if your reverse proxy has an IP address that doesn't match the networks 10/8, 192.168/16, 169.254/16 or
+127/8 you should add an <strong>internalProxies</strong> attribute to the <strong>Valve</strong> element. For example:</p>
+<pre style="background-color:#2b303b;">
+<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">Valve 
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">className</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">org.apache.catalina.valves.RemoteIpValve</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">internalProxies</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">172\.16\.50\.100</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-for</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpProxiesHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-by</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">protocolHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-proto</span><span style="color:#c0c5ce;">&quot; /&gt;
+</span></pre>
+<p>This should fix it for this environment, I'll be looking into a similar (non application code) solution for Jetty and JBoss.</p>
+
+</div>
+
+        </div>
+    </body>
+</html>
