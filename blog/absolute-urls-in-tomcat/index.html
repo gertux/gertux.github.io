@@ -48,37 +48,37 @@ problem.</p>
 Server handles https termination and it's IP address is 192.168.100.254. The backend application URL is
 <strong>http://tomcat.backend.org:8080/cmis</strong></p>
 <p>This snippet goes into Apache's httpd.conf:</p>
-<pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">Location</span><span style="color:#c0c5ce;"> /cmis&gt;
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">RequestHeader set X-Forwarded-Proto &quot;https&quot;
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPreserveHost
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPass http://tomcat.backend.org:8080/cmis
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPassReverse http://tomcat.backend.org:8080/cmis
-</span><span style="color:#c0c5ce;">&lt;/</span><span style="color:#bf616a;">Location</span><span style="color:#c0c5ce;">&gt;
+<pre style="background-color:#2b2c2f;">
+<span style="color:#5fb3b3;">&lt;</span><span style="color:#eb606b;">Location</span><span style="color:#5fb3b3;"> /cmis&gt;
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">RequestHeader set X-Forwarded-Proto &quot;https&quot;
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">ProxyPreserveHost
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">ProxyPass http://tomcat.backend.org:8080/cmis
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">ProxyPassReverse http://tomcat.backend.org:8080/cmis
+</span><span style="color:#5fb3b3;">&lt;/</span><span style="color:#eb606b;">Location</span><span style="color:#5fb3b3;">&gt;
 </span></pre>
 <p>The <strong>ProxyPreserveHost</strong> directive passes the Original Host HTTP header to the proxied host, for this example
 repo.extranet.frontend.org or repo.frontend.org, which will be returned by request.getServerName().</p>
 <p>The <strong>RequestHeader set X-Forwarded-Proto &quot;https&quot;</strong> directive explicitly sets the X-Forwarded-Proto request header which
 will be used by the Tomcat RemoteIpValve.</p>
 <p>This snippet goes into Tomcat's server.xml in the <strong>Engine</strong> section:</p>
-<pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">Valve 
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">className</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">org.apache.catalina.valves.RemoteIpValve</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-for</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpProxiesHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-by</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">protocolHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-proto</span><span style="color:#c0c5ce;">&quot; /&gt;
+<pre style="background-color:#2b2c2f;">
+<span style="color:#5fb3b3;">&lt;</span><span style="color:#eb606b;">Valve 
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">className</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">org.apache.catalina.valves.RemoteIpValve</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">remoteIpHeader</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">x-forwarded-for</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">remoteIpProxiesHeader</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">x-forwarded-by</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">protocolHeader</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">x-forwarded-proto</span><span style="color:#5fb3b3;">&quot; /&gt;
 </span></pre>
 <p>The valve will calculate the client's IP address, will set request.getScheme() to the value of the <strong>X-Forwarded-Proto</strong>
 header (https) and the request.getServerPort() to 443.</p>
 <p><strong>Caution:</strong> if your reverse proxy has an IP address that doesn't match the networks 10/8, 192.168/16, 169.254/16 or
 127/8 you should add an <strong>internalProxies</strong> attribute to the <strong>Valve</strong> element. For example:</p>
-<pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">Valve 
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">className</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">org.apache.catalina.valves.RemoteIpValve</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">internalProxies</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">172\.16\.50\.100</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-for</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">remoteIpProxiesHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-by</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#c0c5ce;">   </span><span style="color:#d08770;">protocolHeader</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">x-forwarded-proto</span><span style="color:#c0c5ce;">&quot; /&gt;
+<pre style="background-color:#2b2c2f;">
+<span style="color:#5fb3b3;">&lt;</span><span style="color:#eb606b;">Valve 
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">className</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">org.apache.catalina.valves.RemoteIpValve</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">internalProxies</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">172\.16\.50\.100</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">remoteIpHeader</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">x-forwarded-for</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">remoteIpProxiesHeader</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">x-forwarded-by</span><span style="color:#5fb3b3;">&quot;
+</span><span style="color:#5fb3b3;">   </span><span style="color:#bb80b3;">protocolHeader</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">x-forwarded-proto</span><span style="color:#5fb3b3;">&quot; /&gt;
 </span></pre>
 <p>This should fix it for this environment, I'll be looking into a similar (non application code) solution for Jetty and JBoss.</p>
 

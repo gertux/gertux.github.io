@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>hobbiton</title>
+        <link rel="stylesheet" href="https:&#x2F;&#x2F;www.hobbiton.be&#x2F;h.css">
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-container">
+                <ul class="nav">
+                    
+                </ul>
+                <div class="about">
+                    <a href="https:&#x2F;&#x2F;www.hobbiton.be"><img src="/i/logo.svg" alt="hobbiton"/></a>
+                    <p class="lead">supporting open source since 1997</p>
+                    <p class="social"><img src="/i/twitter.svg"/><a href="https://twitter.com/gert_dewit">@gert_dewit</a></p>
+                    <p class="social"><img src="/i/github.svg"/><a href="https://github.com/gertux">gertux</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            
+<div class="page">
+  <h1 class="page-title">Repurpose a ST-Link clone</h1>
+  <span class="page-date">2018-11-18</span>
+  <p>The wel known ST-Link clones are built around a quite useful STM32 microcontroller, they come in a small aluminium cover
+with a USB A connector and have 10 pins exposed. Ideal for repurposing !</p>
+<p><a name="continue-reading"></a></p>
+<p>The STM23F101CBT6 is a ARM Cortex-M3 core microcontroller with 128KB flash, 16KB SRAM and a slew of timers, buses and
+GPIOs.</p>
+<p>As there are only 10 pins externally available the options for repurposing are not endless but it's a possible
+good starting point for quite some projects.</p>
+<table><thead><tr><th align="right"> Con Pinn </th><th align="center"> ST-Link Function </th><th align="right"> MCU Pin </th><th align="center"> Main function </th><th align="center"> Alternate functions           </th></tr></thead><tbody>
+<tr><td align="right">        1 </td><td align="center"> RST              </td><td align="right">      42 </td><td align="center"> GPIO PB6      </td><td align="center"> I2C1_SCL, TIM4_CH1, USART1_TX </td></tr>
+<tr><td align="right">        2 </td><td align="center"> SWDIO            </td><td align="right">      27 </td><td align="center"> GPIO PB14     </td><td align="center"> SPI2_MISO, USART3_RTS         </td></tr>
+<tr><td align="right">     3, 4 </td><td align="center"> GND              </td><td align="right">         </td><td align="center">               </td><td align="center">                               </td></tr>
+<tr><td align="right">        5 </td><td align="center"> SWIM             </td><td align="right">      45 </td><td align="center"> GPIO PB8      </td><td align="center"> TIM4_CH3                      </td></tr>
+<tr><td align="right">        6 </td><td align="center"> SWCLK            </td><td align="right">      15 </td><td align="center"> GPIO PA5      </td><td align="center"> SPI1_SCK, ADC_IN5             </td></tr>
+<tr><td align="right">        6 </td><td align="center"> SWCLK            </td><td align="right">      26 </td><td align="center"> GPIO PB13     </td><td align="center"> SPI2_SCK, USART3_CTS          </td></tr>
+<tr><td align="right">     7, 8 </td><td align="center"> 3.3V             </td><td align="right">         </td><td align="center">               </td><td align="center">                               </td></tr>
+<tr><td align="right">    9, 10 </td><td align="center"> 5V               </td><td align="right">         </td><td align="center">               </td><td align="center">                               </td></tr>
+</tbody></table>
+<p>If you want to avoid soldering and/or cutting existing traces only 5 GPIOs are externally available on 4 pins, but for
+the less than 2€ it's hard to find a device that is as capable in a small enclosure with an attached USB connector.</p>
+<p>Without any hardware modifications you have 5 GPIOs of which 2 are PWM capable (TIM4_CH1 and TIM4_CH3) and 1 possible
+ADC pin (ADC_IN5)</p>
+<p><img src="./stlink2.svg" alt="schema" /></p>
+<p>The schema was drawn based on the PCB of one my devices, yours could be a little different but the MCU pin to
+output pin mapping should be the same, otherwise the ST firmware would not work.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>(at least) 2 ST-Link clones, if you want to repurpose one you need an other one to do the programming if you don't
+have access to an other SWD programmer.</li>
+<li><a href="http://openocd.org">OpenOCD</a> you have to unlock the microcontroller before you can reflash the firmware and/or the
+bootloader, OpenOCD is the tool I use maybe there are other tools that can unlock a STM32 but they're unknown to me.
+OpenOCD is also used to flash the firmware and bootloader.</li>
+<li>jumper wires with at least on one side a dupont style connector, if you've got minigrabbers you don't have to solder
+programming wires</li>
+</ol>
+<h2 id="programming-pins">Programming pins</h2>
+<p>The ST-Link clones have programming connections on the PCB. You can access them by sliding the cover of, the cover is
+not glued close but you can feel some friction.</p>
+<p><img src="./pinout.jpg" alt="Pinout" /></p>
+<p>The PCB should look like the annotated picture, there are ST-Link clones where the pinouts are different but it's quite
+easy to measure your clone's pinout with a multimeter in continuity testing mode. The SWDIO connection should be
+connected to pin 34 (the pin numbers start with pin 1 at the location of the dot on the MCU) and SWCLK is pin 37.</p>
+<p>Ground (GND) can be tested using the GND pin on the 10 pin header, the same goes for the 3.3V pin. It is not necessary
+to find the GND and 3.3V pins to program the clone because you can use the connections on the pin header, it is a good
+idea to measure it anyway to make sure you're right about the SWDIO and SWCLK connections.</p>
+<p><img src="./flash-bmp.jpg" alt="Flash" /></p>
+<p>If you connect ground and 3.3V using the 10 pin header you should be able to use mini grabbers for the SWDIO an SWCLK
+signals.</p>
+<h2 id="flashing">Flashing</h2>
+<p>Before you can flash your own firmware to the device you have to unlock it using <a href="http://openocd.org">OpenOCD</a>.</p>
+<pre style="background-color:#2b2c2f;">
+<span style="color:#cccece;">$ openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c &quot;init&quot; -c &quot;halt&quot; \
+</span><span style="color:#cccece;">    </span><span style="color:#cccece;">-c &quot;stm32f1x unlock 0&quot; -c &quot;shutdown&quot;
+</span><span style="color:#cccece;">Open On-Chip Debugger 0.10.0
+</span><span style="color:#cccece;">Licensed under GNU GPL v2
+</span><span style="color:#cccece;">For bug reports, read
+</span><span style="color:#cccece;">        </span><span style="color:#cccece;">http://openocd.org/doc/doxygen/bugs.html
+</span><span style="color:#cccece;">Info : auto-selecting first available session transport &quot;hla_swd&quot;. To override use &#39;transport select &lt;transport&gt;&#39;.
+</span><span style="color:#cccece;">Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+</span><span style="color:#cccece;">adapter speed: 1000 kHz
+</span><span style="color:#cccece;">adapter_nsrst_delay: 100
+</span><span style="color:#cccece;">none separate
+</span><span style="color:#cccece;">Info : Unable to match requested speed 1000 kHz, using 950 kHz
+</span><span style="color:#cccece;">Info : Unable to match requested speed 1000 kHz, using 950 kHz
+</span><span style="color:#cccece;">Info : clock speed 950 kHz
+</span><span style="color:#cccece;">Info : STLINK v2 JTAG v28 API v2 SWIM v7 VID 0x0483 PID 0x3748
+</span><span style="color:#cccece;">Info : using stlink api v2
+</span><span style="color:#cccece;">Info : Target voltage: 3.249867
+</span><span style="color:#cccece;">Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
+</span><span style="color:#cccece;">target halted due to debug-request, current mode: Thread 
+</span><span style="color:#cccece;">xPSR: 0x61000000 pc: 0x08003d5a msp: 0x20004e38
+</span><span style="color:#cccece;">Info : device id = 0x20036410
+</span><span style="color:#cccece;">Info : flash size = 128kbytes
+</span><span style="color:#cccece;">stm32x unlocked.
+</span><span style="color:#cccece;">INFO: a reset or power cycle is required for the new settings to take effect.
+</span><span style="color:#cccece;">shutdown command invoked
+</span></pre>
+<p>Next power cycle the device by removing the 3.3V power wire.</p>
+<p>You can now erase the flash and write your own firmware to it.</p>
+<pre style="background-color:#2b2c2f;">
+<span style="color:#cccece;">$ openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c &quot;init&quot; -c &quot;halt&quot; \
+</span><span style="color:#cccece;">    </span><span style="color:#cccece;">-c &quot;flash write_image erase hello 0x8000000&quot; -c &quot;shutdown&quot;
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Open On-Chip Debugger 0.10.0
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Licensed under GNU GPL v2
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">For bug reports, read
+</span><span style="color:#cccece;">          </span><span style="color:#cccece;">http://openocd.org/doc/doxygen/bugs.html
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : auto-selecting first available session transport &quot;hla_swd&quot;. To override use &#39;transport select &lt;transport&gt;&#39;.
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">adapter speed: 1000 kHz
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">adapter_nsrst_delay: 100
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">none separate
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : Unable to match requested speed 1000 kHz, using 950 kHz
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : Unable to match requested speed 1000 kHz, using 950 kHz
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : clock speed 950 kHz
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : STLINK v2 JTAG v28 API v2 SWIM v7 VID 0x0483 PID 0x3748
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : using stlink api v2
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : Target voltage: 3.249867
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">auto erase enabled
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : device id = 0x20036410
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">Info : flash size = 128kbytes
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">target halted due to breakpoint, current mode: Thread 
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">xPSR: 0x61000000 pc: 0x2000003a msp: 0x20004e20
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">wrote 21504 bytes from file hello in 1.222309s (17.181 KiB/s)
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">shutdown command invoked
+</span></pre><h2 id="releasing-more-pins">Releasing more pins</h2>
+<p>If you need more than the standard broken out pins and are not afraid to solder, small changes can bring some nice
+extras.</p>
+<p><img src="./swim-resistors.jpg" alt="SWIM Resistors" /></p>
+<p>If you replace resistor R8 with a 0Ω one or solder bridge, you connect both MCU pin 43 (PB7) and MCU pin 46 (PB9) with
+connector pin 5 (SWIM). It's probably also a good idea to remove the 680Ω pull up resistor R10 just next to R8 if you
+don't need it for you application.</p>
+<p>With this simple soldering action you can now use USART1 on pins 42 (TX) and 43 (RX) or even I2C1 on the same pins 42
+(SCL) and 43 (SCA).</p>
+
+</div>
+
+        </div>
+    </body>
+</html>

@@ -35,25 +35,25 @@ HTTP request is discarded and never sent to the backend system.</p>
 <h2 id="install">Install</h2>
 <p>The module uses the GNU autotools installation method, you just have to tell it where your Apache server is installed.
 Your Apache server needs to support DSO modules.</p>
-<pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">./configure --with-apache</span><span style="color:#c0c5ce;">=/path/to/apache/install
-</span><span style="color:#bf616a;">make
-</span><span style="color:#bf616a;">make</span><span style="color:#c0c5ce;"> install
+<pre style="background-color:#2b2c2f;">
+<span style="color:#6699cc;">./configure</span><span style="color:#5fb3b3;"> --</span><span style="color:#f99157;">with-apache</span><span style="color:#5fb3b3;">=</span><span style="color:#6699cc;">/path/to/apache/install
+</span><span style="color:#6699cc;">make
+</span><span style="color:#6699cc;">make install
 </span></pre>
 <p>The install action will place libmodhacf.so in the Apache server's modules directory and add a <strong>LoadModule</strong> directive
 in httpd.conf. You should see a line similar to the following in your httpd.conf:</p>
-<pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">LoadModule hacf_module        modules/libmodhacf.so
+<pre style="background-color:#2b2c2f;">
+<span style="color:#cccece;">LoadModule hacf_module        modules/libmodhacf.so
 </span></pre><h2 id="usage">Usage</h2>
 <p>If you already use an Apache reverse proxy, just add the correct <b>HacfLanguage</b> directive to the relevant section
 of your httpd.conf.</p>
 <p>The configuration for a Java site with URL http://server.example.com/app would be:</p>
-<pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">&lt;</span><span style="color:#bf616a;">location </span><span style="color:#d08770;">app</span><span style="color:#c0c5ce;">=&quot;</span><span style="color:#a3be8c;">/app</span><span style="color:#c0c5ce;">&quot;&gt;
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">HacfLanguage Java
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPass http://server.example.com/app
-</span><span style="color:#c0c5ce;">  </span><span style="color:#c0c5ce;">ProxyPassReverse http://server.example.com/app
-</span><span style="color:#c0c5ce;">&lt;/</span><span style="color:#bf616a;">location</span><span style="color:#c0c5ce;">&gt;
+<pre style="background-color:#2b2c2f;">
+<span style="color:#5fb3b3;">&lt;</span><span style="color:#eb606b;">location </span><span style="color:#bb80b3;">app</span><span style="color:#5fb3b3;">=&quot;</span><span style="color:#99c794;">/app</span><span style="color:#5fb3b3;">&quot;&gt;
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">HacfLanguage Java
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">ProxyPass http://server.example.com/app
+</span><span style="color:#cccece;">  </span><span style="color:#cccece;">ProxyPassReverse http://server.example.com/app
+</span><span style="color:#5fb3b3;">&lt;/</span><span style="color:#eb606b;">location</span><span style="color:#5fb3b3;">&gt;
 </span></pre>
 <p>For a PHP5 site, use PHP as the value of the HacfLanguage setting.</p>
 <p>The request filtering can be tuned using the parameters:</p>
