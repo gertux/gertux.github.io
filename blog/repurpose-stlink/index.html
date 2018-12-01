@@ -25,7 +25,7 @@
 <div class="page">
   <h1 class="page-title">Repurpose a ST-Link clone</h1>
   <span class="page-date">2018-11-18</span>
-  <p>The wel known ST-Link clones are built around a quite useful STM32 microcontroller, they come in a small aluminium cover
+  <p>The well known ST-Link clones are built around a quite useful STM32 microcontroller, they come in a small aluminium cover
 with a USB A connector and have 10 pins exposed. Ideal for repurposing !</p>
 <p><a name="continue-reading"></a></p>
 <p>The STM23F101CBT6 is a ARM Cortex-M3 core microcontroller with 128KB flash, 16KB SRAM and a slew of timers, buses and
@@ -43,19 +43,19 @@ good starting point for quite some projects.</p>
 <tr><td align="right">    9, 10 </td><td align="center"> 5V               </td><td align="right">         </td><td align="center">               </td><td align="center">                               </td></tr>
 </tbody></table>
 <p>If you want to avoid soldering and/or cutting existing traces only 5 GPIOs are externally available on 4 pins, but for
-the less than 2€ it's hard to find a device that is as capable in a small enclosure with an attached USB connector.</p>
+less than 2€ it's hard to find a device that is as capable in a small enclosure with an attached USB connector.</p>
 <p>Without any hardware modifications you have 5 GPIOs of which 2 are PWM capable (TIM4_CH1 and TIM4_CH3) and 1 possible
 ADC pin (ADC_IN5)</p>
 <p><img src="./stlink2.svg" alt="schema" /></p>
 <p>The schema was drawn based on the PCB of one my devices, yours could be a little different but the MCU pin to
-output pin mapping should be the same, otherwise the ST firmware would not work.</p>
+output pin mapping should be the same, otherwise the ST Link firmware would not work.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ol>
 <li>(at least) 2 ST-Link clones, if you want to repurpose one you need an other one to do the programming if you don't
 have access to an other SWD programmer.</li>
-<li><a href="http://openocd.org">OpenOCD</a> you have to unlock the microcontroller before you can reflash the firmware and/or the
-bootloader, OpenOCD is the tool I use maybe there are other tools that can unlock a STM32 but they're unknown to me.
-OpenOCD is also used to flash the firmware and bootloader.</li>
+<li><a href="http://openocd.org">OpenOCD</a>, you have to unlock the microcontroller before you can reflash the firmware and/or the
+bootloader, OpenOCD is the tool I use. Maybe there are other tools that can unlock a STM32 but they're unknown to me.
+OpenOCD is also used to erase and flash the firmware.</li>
 <li>jumper wires with at least on one side a dupont style connector, if you've got minigrabbers you don't have to solder
 programming wires</li>
 </ol>
@@ -133,11 +133,11 @@ signals.</p>
 <p>If you need more than the standard broken out pins and are not afraid to solder, small changes can bring some nice
 extras.</p>
 <p><img src="./swim-resistors.jpg" alt="SWIM Resistors" /></p>
-<p>If you replace resistor R8 with a 0Ω one or solder bridge, you connect both MCU pin 43 (PB7) and MCU pin 46 (PB9) with
+<p>If you replace resistor R8 with a 0Ω one or a solder bridge, you connect both MCU pin 43 (PB7) and MCU pin 46 (PB9) with
 connector pin 5 (SWIM). It's probably also a good idea to remove the 680Ω pull up resistor R10 just next to R8 if you
 don't need it for you application.</p>
 <p>With this simple soldering action you can now use USART1 on pins 42 (TX) and 43 (RX) or even I2C1 on the same pins 42
-(SCL) and 43 (SCA).</p>
+(SCL) and 43 (SCA) if you manage to sort out the I²C bus pull ups externally.</p>
 
 </div>
 
